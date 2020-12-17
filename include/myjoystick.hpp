@@ -110,11 +110,11 @@ public:
 		
 		cur_dire_btn = joy_info->dwPOV;
 
-		xy_point.x = (joy_info->dwXpos - 32767.0) / 33024.0;
-		xy_point.y = (32511.0 - joy_info->dwYpos) / 33024.0;
+		xy_point.x = joy_info->dwXpos - 32767.0;
+		xy_point.y = 32511.0 - joy_info->dwYpos;
 
-		uv_point.x = (32767.0 - joy_info->dwZpos) / 33024.0;
-		uv_point.y = (32511.0 - joy_info->dwRpos) / 33024.0;
+		uv_point.x = joy_info->dwZpos - 32767.0;
+		uv_point.y = 32511.0 - joy_info->dwRpos;
 
 		cur_btn = joy_info->dwButtons;
 		if (cur_btn == 512){
@@ -149,9 +149,6 @@ public:
 			}
 			pre_dire_btn = cur_dire_btn;
 		}
-
-		cout << "xy×ø±ê£º£¨" << xy_point.x << "," << xy_point.y << "£©" << endl;
-		cout << "uv×ø±ê£º£¨" << uv_point.x << "," << uv_point.y << "£©" << endl;
 
 		if (cur_btn != pre_btn){
 			switch (cur_btn) {

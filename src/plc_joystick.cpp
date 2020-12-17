@@ -1,10 +1,9 @@
 #include "plc_joystick.h"
 
-#define MAX_SPEED 27648.0
-#define XY_MAX_SPEED 19550.0
+#define MAX_SPEED 19550.0
 #define MEDIUM_SPEED 15000.0
 
-#define DRIFTING_VALUE 0.1
+#define DRIFTING_VALUE 0.075
 
 PLCJoystick::PLCJoystick(UINT joy_id) : MyJoyStick(joy_id) {
 	speed = new double[]{ 0.0, 0.0, 0.0, 0.0 };
@@ -19,7 +18,7 @@ double* PLCJoystick::getSpeed() {
 }
 
 void PLCJoystick::listenJs(){
-	cout << listen_flag << endl;
+	// cout << listen_flag << endl;
 	if (!listen_flag) return;
 	
 	switch (cur_dire_btn){
@@ -50,17 +49,31 @@ void PLCJoystick::listenJs(){
 	// cout << "xy×ø±ê£º£¨" << xy_point.x << "," << xy_point.y << "£©" << endl;
 	// cout << "uv×ø±ê£º£¨" << uv_point.x << "," << uv_point.y << "£©" << endl;
 
-	if(uv_point.y > 0 && (xy_point.x || xy_point.y)){
-		speed = new double[] {XY_MAX_SPEED* uv_point.y*(-xy_point.x + xy_point.y), XY_MAX_SPEED* uv_point.y* (xy_point.x + xy_point.y), XY_MAX_SPEED* uv_point.y* (-xy_point.x + xy_point.y), XY_MAX_SPEED* uv_point.y* (xy_point.x + xy_point.y)};
+	double cos = 0.0, sin = 0.0;
+	if (xy_point.x != 0 || xy_point.y != 0) {
+		cos = xy_point.x / (sqrt(xy_point.x * xy_point.x + xy_point.y * xy_point.y));
+		sin = xy_point.y / (sqrt(xy_point.x * xy_point.x + xy_point.y * xy_point.y));
 	}
-	else if (uv_point.x != 0 && fabs(uv_point.y) < DRIFTING_VALUE) {
-		speed = new double[] {-MEDIUM_SPEED * uv_point.x, MEDIUM_SPEED* uv_point.x, MEDIUM_SPEED* uv_point.x, -MEDIUM_SPEED * uv_point.x };
+	
+	double v_level = uv_point.y / 32511.0;
+	double w_level = uv_point.x / 32767.0;
+
+	if(v_level > DRIFTING_VALUE  && (cos != 0.0 || sin != 0.0)){
+		speed = new double[] {-MAX_SPEED* v_level*cos + MAX_SPEED * v_level * sin,
+			MAX_SPEED * v_level * cos + MAX_SPEED * v_level * sin,
+			-MAX_SPEED * v_level * cos + MAX_SPEED * v_level * sin, 
+			MAX_SPEED * v_level * cos + MAX_SPEED * v_level * sin};
+	}
+	else if (fabs(w_level) > DRIFTING_VALUE) {
+		speed = new double[] {-MEDIUM_SPEED * w_level, MEDIUM_SPEED* w_level, MEDIUM_SPEED* w_level, -MEDIUM_SPEED * w_level };
 
 	}
-	else if (uv_point.y < 0) {
-		speed = new double[] {MEDIUM_SPEED* uv_point.y, MEDIUM_SPEED* uv_point.y, MEDIUM_SPEED* uv_point.y, MEDIUM_SPEED* uv_point.y};
+	else if (v_level < -DRIFTING_VALUE) {
+		
+		speed = new double[] {MEDIUM_SPEED* v_level, MEDIUM_SPEED* v_level, MEDIUM_SPEED* v_level, MEDIUM_SPEED* v_level};
 	}
 	else {
+
 		speed = new double[] {0.0, 0.0, 0.0, 0.0};
 	}
 
