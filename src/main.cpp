@@ -13,7 +13,10 @@ int main(int argc, char** argv) {
 		joystick.listenJs();
 		// memcpy(speed, joystick.getSpeed(), sizeof(speed));
 		speed = joystick.getSpeed();
-		cout << "speed:" << speed[0] << "\t" << speed[1] << "\t" << speed[2] << "\t" << speed[3] << endl;
+		if (speed == NULL) {
+			continue;
+		}
+		cout << "x_speed:" << speed[0] << "\ty_speed:" << speed[1] << "\tw_speed:" << speed[2] << endl;
 		Sleep(100);
 	}
 	

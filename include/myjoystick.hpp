@@ -1,13 +1,14 @@
 #pragma once
 
-#include <iostream>
-#include <string>
+#define WIN32_LEAN_AND_MEAN
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
 #include <iostream>
 #include <Windows.h>
 #include <joystickapi.h>
 
 #pragma comment(lib, "Winmm.lib")
-
 
 using namespace std;
 
@@ -24,7 +25,7 @@ public:
 
 class MyJoyStick
 {
-protected:
+public:
 	//手柄ID
 	UINT joy_id;
 	//手柄信息
@@ -48,7 +49,6 @@ protected:
 	//当前按钮号
 	int cur_btn;
 
-public:
 
 	MyJoyStick(UINT joy_id) {
 		this->joy_id = joy_id;
@@ -69,10 +69,10 @@ public:
 	bool getJsCaps() {
 		ret_code = joyGetDevCaps(joy_id, &joy_caps, sizeof JOYCAPS);
 		if (ret_code) {
-			cout << "error code:  " << ret_code << endl;
+			// cout << "error code:  " << ret_code << endl;
 			return false;
 		}
-		
+
 		cout << "产品标识符：" << joy_caps.wPid << endl;
 		cout << "产品名称：" << joy_caps.szPname << endl;
 		cout << "最小x坐标：" << joy_caps.wXmin << endl;
@@ -104,10 +104,10 @@ public:
 
 		ret_code = joyGetPosEx(joy_id, joy_info);
 		if (ret_code) {
-			cout << "error code:  " << ret_code << endl;
+			// cout << "error code:  " << ret_code << endl;
 			return false;
 		}
-		
+
 		cur_dire_btn = joy_info->dwPOV;
 
 		xy_point.x = joy_info->dwXpos - 32767.0;
@@ -116,11 +116,12 @@ public:
 		uv_point.x = joy_info->dwZpos - 32767.0;
 		uv_point.y = 32511.0 - joy_info->dwRpos;
 
+
 		cur_btn = joy_info->dwButtons;
-		if (cur_btn == 512){
+		if (cur_btn == 512) {
 			listen_flag = true;
 		}
-		else if (cur_btn == 256){
+		else if (cur_btn == 256) {
 			listen_flag = false;
 		}
 		return true;
@@ -129,9 +130,9 @@ public:
 	//监听手柄
 	virtual void listenJs() {
 		if (!listen_flag) return;
-		
-		if (cur_dire_btn != pre_dire_btn){
-			switch (cur_dire_btn){
+
+		if (cur_dire_btn != pre_dire_btn) {
+			switch (cur_dire_btn) {
 			case 0:
 				cout << "方向键上" << endl;
 				break;
@@ -150,7 +151,10 @@ public:
 			pre_dire_btn = cur_dire_btn;
 		}
 
-		if (cur_btn != pre_btn){
+		// cout << "xy坐标：（" << xy_point.x << "," << xy_point.y << "）" << endl;
+		// cout << "uv坐标：（" << uv_point.x << "," << uv_point.y << "）" << endl;
+
+		if (cur_btn != pre_btn) {
 			switch (cur_btn) {
 			case 2:
 				cout << "A" << endl;
@@ -192,7 +196,7 @@ public:
 	}
 
 	virtual ~MyJoyStick() {
-		if (joy_info != NULL){
+		if (joy_info != NULL) {
 			delete joy_info;
 			joy_info = NULL;
 		}

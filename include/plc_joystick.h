@@ -7,7 +7,7 @@ public:
 
 	PLCJoystick(UINT joy_id);
 
-	void setSpeed(double* speed);
+	bool getDetectLane();
 
 	double* getSpeed();
 
@@ -17,8 +17,11 @@ public:
 
 
 private:
-	// 定义右前轮、左前轮、左后轮、右后轮转数
-	double* speed = new double[4];
-	
-};
+	// 开启黑白循迹
+	bool detect_lane;
+	double xy_maxspeed;
+	// 定义x、y方向速度以及z轴旋转角速度（采用机器人右手坐标系）
+	double* speed = new double[3];
 
+
+};
